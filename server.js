@@ -4,6 +4,7 @@ import path from "path";
 import url from "url";
 import "dotenv/config";
 import OpenAI from "openai";
+import axios from "axios";
 
 export const openai = new OpenAI();
 
