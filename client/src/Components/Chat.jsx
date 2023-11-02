@@ -1,10 +1,9 @@
 import { useState } from "react";
 
 const botMessages = ["Message received!", "Wow!", "Heard.", "Okay.", "Alright.", "Interesting.", "Tell me more.", "Oh, really?", "I see."];
+const getBotMessage = () => botMessages[Math.floor(Math.random() * botMessages.length)];
 
 function Chat() {
-
-    const getBotMessage = () => botMessages[Math.floor(Math.random() * botMessages.length)];
 
     const [messageInput, setMessageInput] = useState("");
     const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "bot"}]
