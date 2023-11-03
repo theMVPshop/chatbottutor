@@ -1,7 +1,25 @@
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
+  height: 100%;
 }
 
-:root {
-  margin: 1rem;
+/* Remove default list styles */
+ul,
+ol {
+  list-style: none;
+}
+
+/* Remove underlines from links */
+a {
+  text-decoration: none;
+}
+
+/* Remove default text styles */
+body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  height: 100%;
 }
