@@ -8,11 +8,11 @@ const ChatInput = ({ messageInput, handleMessageInputChange, onSend }) => {
         <Search
           type="text"
           onChange={handleMessageInputChange}
-          placeholder="How Can I help you?"
+          placeholder="How can I help you?"
           value={messageInput}
         />
         {!messageInput ? (
-          <DisabledBtn>
+          <DisabledBtn disabled={true}>
             <StyledIcon icon="send-message" size={20} />
           </DisabledBtn>
         ) : (
@@ -77,11 +77,12 @@ const StyledIcon = styled(Icon)`
   align-items: center;
 `;
 
-const DisabledBtn = styled.div`
+const DisabledBtn = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 5px;
+  border: none;
   border-radius: 5px;
   width: 40px;
   height: 40px;
@@ -90,15 +91,17 @@ const DisabledBtn = styled.div`
   }
 `;
 
-const SubmitBtn = styled.div`
+const SubmitBtn = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 5px;
+  border: none;
   border-radius: 5px;
   width: 40px;
   height: 40px;
   background-color: green;
+  cursor: pointer;
   &:hover {
     background-color: darkgreen;
   }
