@@ -18,6 +18,7 @@ function Chat() {
   const getBotMessage = () =>
     botMessages[Math.floor(Math.random() * botMessages.length)];
 
+
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "bot"}]
 
@@ -55,6 +56,7 @@ function Chat() {
       </InputWrap>
     </ChatWrap>
   );
+
 }
 
 export default Chat;
