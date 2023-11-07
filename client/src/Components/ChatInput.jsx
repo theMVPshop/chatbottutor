@@ -1,8 +1,9 @@
 import styled from "styled-components";
 import { Icon } from "@blueprintjs/core";
 
+
 // eslint-disable-next-line react/prop-types
-const ChatInput = ({ messageInput, handleMessageInputChange, onSend }) => {
+const ChatInput = ({ messageInput, handleMessageInputChange, onSend, gptComplete }) => {
   return (
     <MainWrap>
       <SearchWrapper>

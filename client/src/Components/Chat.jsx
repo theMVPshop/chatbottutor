@@ -5,74 +5,16 @@ import { socket } from "../socket.js";
 import "../App.css";
 import AppBar from "./AppBar.jsx";
 
-const botMessages = [
-  "Message received!",
-  "Wow!",
-  "Heard.",
-  "Okay.",
-  "Alright.",
-  "Interesting.",
-  "Tell me more.",
-  "Oh, really?",
-  "I see.",
-];
-
-const getBotMessage = () =>
-  botMessages[Math.floor(Math.random() * botMessages.length)];
-
 function Chat() {
-  const [isConnected, setIsConnected] = useState(socket.connected);
-  const [fooEvents, setFooEvents] = useState([]);
 
   const [currentResponse, setCurrentResponse] = useState("");
-
-  function sendGPTRequest() {
-    socket.emit("gpt-request", { prompt: gptPrompt });
-  }
-
-  useEffect(() => {
-    function onConnect() {
-      setIsConnected(true);
-    }
-
-    function onDisconnect() {
-      setIsConnected(false);
-    }
-
-    function onFooEvent(value) {
-      setFooEvents((previous) => [...previous, value]);
-    }
-
-    function onGptResponse(data) {
-      console.log("Received a GPT response:", data);
-      setCurrentResponse((prevResponse) => prevResponse + data);
-    }
-
-    socket.on("gpt-response", onGptResponse);
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-    socket.on("foo", onFooEvent);
-
-    // Listen for an error event
-    socket.on("gpt-error", (error) => {
-      console.error("Received a GPT error:", error);
-      // Handle error (show error message to the user, etc.)
-    });
-
-    return () => {
-      socket.off("gpt-response", onGptResponse);
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-      socket.off("foo", onFooEvent);
-    };
-  }, []);
-
-  const [gptPrompt, setGptPrompt] = useState("");
   const [messageInput, setMessageInput] = useState("");
-  const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "bot"}]
+  const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "gpt"}]
+  const [gptComplete, setGptComplete] = useState(true);
 
-  function handlePromptChange(e) {
-    setGptPrompt(e.target.value);
+  function sendGPTRequest(prompt) {
+    socket.emit('gpt-request', { prompt });
+    console.log(socket.connected)
   }
 
   function handleMessageInputChange(e) {
@@ -83,11 +25,75 @@ function Chat() {
     e.preventDefault();
     setMessages((prevMessages) => [
       ...prevMessages,
-      { text: messageInput, sender: "Me" },
-      { text: getBotMessage(), sender: "AI Tutor" },
+      { text: messageInput, sender: "user" },
     ]);
+    setGptComplete(false);
+    sendGPTRequest(messageInput);
     setMessageInput("");
   }
+
+  useEffect(() => {
+
+    function onConnect() {
+      console.log('Connected!');
+    }
+
+    function onDisconnect() {
+      console.log('Disconnected!');
+    }
+
+    function onGptResponse(data) {
+      console.log(data);
+      setCurrentResponse(prevData => prevData + data);
+    }
+
+    function onGptComplete() {
+      setGptComplete(true);
+    }
+
+    function onGptError(error) {
+      console.error('Received a GPT error:', error);
+    }
+
+    socket.on('gpt-response', onGptResponse);
+    socket.on('gpt-complete', onGptComplete);
+    socket.on('gpt-error', onGptError);
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+
+    return () => {
+      socket.off('gpt-response', onGptResponse);
+      socket.off('connect', onConnect);
+      socket.off('gpt-complete', onGptComplete);
+      socket.off('gpt-error', onGptError);
+      socket.off('disconnect', onDisconnect);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!currentResponse) {
+      return;
+    }
+    setMessages(prevMessages => {
+      const newMessages = [...prevMessages];
+
+      if (newMessages.length > 0 && newMessages[newMessages.length - 1].sender === 'gpt') {
+        newMessages[newMessages.length - 1].text = currentResponse;
+      } else {
+        newMessages.push({ text: currentResponse, sender: 'gpt' });
+      }
+
+      return newMessages;
+    });
+  }, [currentResponse]);
+
+  useEffect(() => {
+    if (gptComplete) {
+      if (messages[messages.length - 1]?.text === currentResponse && messages[messages.length - 1]?.sender === 'gpt') {
+        setCurrentResponse("");
+      }
+    }
+  }, [gptComplete, messages, currentResponse]);
 
   const messagesEndRef = useRef(null);
 
@@ -206,12 +212,3 @@ const TextBubble = styled.div`
   width: fit-content;
   padding: 10px 20px;
 `;
-
-//       <div>
-//         <label style={{ display: "flex", flexDirection: "column", height: "20rem" }}>
-//           Ask GPT
-//           <input value={gptPrompt} onChange={handlePromptChange} type="text" /> <br />
-//           <button onClick={sendGPTRequest}>Submit</button>
-//         </label>
-//         {currentResponse}
-//       </div>
