@@ -1,5 +1,5 @@
 import axios from "axios";
-import { openai } from "../../server";
+import { openai } from "../../server.js";
 
 
 
