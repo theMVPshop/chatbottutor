@@ -5,7 +5,7 @@ import url from "url";
 import "dotenv/config";
 import OpenAI from "openai";
 import axios from "axios";
-import chatRouter from "./server/routes/chat";
+import chatRouter from "./server/routes/chat.js";
 
 import { Server } from "socket.io";
 import { createServer } from 'http';
