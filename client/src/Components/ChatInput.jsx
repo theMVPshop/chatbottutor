@@ -3,29 +3,39 @@ import { Icon } from "@blueprintjs/core";
 
 const ChatInput = ({ messageInput, handleMessageInputChange, onSend, gptComplete }) => {
   return (
-    <SearchWrapper>
-      <SearchInput>
-        <Search
-          type="text"
-          onChange={handleMessageInputChange}
-          placeholder="How can I help you?"
-          value={messageInput}
-        />
-        {!messageInput || !gptComplete ? (
-          <DisabledBtn disabled={true}>
-            <StyledIcon icon="send-message" size={20} />
-          </DisabledBtn>
-        ) : (
-          <SubmitBtn onClick={onSend}>
-            <StyledIcon icon="send-message" size={20} />
-          </SubmitBtn>
-        )}
-      </SearchInput>
-    </SearchWrapper>
+    <MainWrap>
+      <SearchWrapper>
+        <SearchInput>
+          <Search
+            type="text"
+            onChange={handleMessageInputChange}
+            placeholder="How can I help you?"
+            value={messageInput}
+          />
+          {!messageInput ? (
+            <DisabledBtn disabled={true}>
+              <StyledIcon icon="send-message" size={20} />
+            </DisabledBtn>
+          ) : (
+            <SubmitBtn onClick={onSend}>
+              <StyledIcon icon="send-message" size={20} />
+            </SubmitBtn>
+          )}
+        </SearchInput>
+      </SearchWrapper>
+      <Foot>
+        <p>Powered by ChatGPT</p>
+      </Foot>
+    </MainWrap>
   );
 };
 
 export default ChatInput;
+const MainWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+`;
 
 const SearchWrapper = styled.div`
   display: flex;
@@ -86,7 +96,7 @@ const DisabledBtn = styled.button`
   border-radius: 5px;
   width: 40px;
   height: 40px;
-  background-color: lightgray;
+  background-color: #eaeef3;
   &:hover {
   }
 `;
@@ -100,9 +110,14 @@ const SubmitBtn = styled.button`
   border-radius: 5px;
   width: 40px;
   height: 40px;
-  background-color: green;
+  background-color: #0157f9;
   cursor: pointer;
   &:hover {
-    background-color: darkgreen;
+    background-color: #93bcf5;
   }
+`;
+
+const Foot = styled.div`
+  width: 100%;
+  text-align: center;
 `;
