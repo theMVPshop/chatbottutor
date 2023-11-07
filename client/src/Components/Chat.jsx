@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ChatInput from "./ChatInput.jsx";
 import styled from "styled-components";
-import { Icon } from "@blueprintjs/core";
 import { socket } from "../socket.js";
+import "../App.css";
+import AppBar from "./AppBar.jsx";
 
 function Chat() {
 
@@ -94,33 +95,34 @@ function Chat() {
     }
   }, [gptComplete, messages, currentResponse]);
 
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
     <ChatWrap className="chat-container">
-      <AppBar>
-        <Content>
-          <Logo>
-            <StyledIcon icon="comment" size={20} />
-          </Logo>
-          <Title>
-            <h1>Chatbot Tutor</h1>
-            <StatusWrapper>
-              <div></div>
-              <p>Online</p>
-            </StatusWrapper>
-          </Title>
-        </Content>
-      </AppBar>
+      <AppBar />
       <Display className="messages-container">
         {messages.map((message, index) => {
           return (
             <Message key={index} className={`${message.sender}`}>
-              <p>{message.sender}</p>
+              <User>
+                <p>{message.sender}</p>
+              </User>
+
               <TextBubble className={`${message.sender}`}>
                 <p>{message.text}</p>
               </TextBubble>
             </Message>
           );
         })}
+        <div ref={messagesEndRef} />
       </Display>
       <InputWrap>
         <ChatInput
@@ -141,63 +143,6 @@ const ChatWrap = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
-  background-color: #eaeef3;
-`;
-
-const AppBar = styled.div`
-  display: flex;
-  justify-content: center;
-  height: 60px;
-  width: 100%;
-  background-color: white;
-  position: fixed;
-`;
-
-const Content = styled.div`
-  padding: 0 20px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  width: 940px;
-  @media only screen and (max-width: 980px) {
-    width: 100%;
-  }
-`;
-
-const Logo = styled.div`
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #0157f9;
-  border-radius: 5px;
-`;
-
-const Title = styled.div`
-  display: flex;
-  flex-direction: column;
-  h1 {
-    font-size: 20px;
-    margin: 0;
-    padding: 0;
-  }
-`;
-const StatusWrapper = styled.div`
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  div {
-    height: 10px;
-    width: 10px;
-    border-radius: 999px;
-    background-color: #69de3f;
-  }
-  p {
-    font-size: 15px;
-    margin: 0;
-    padding: 0;
-  }
 `;
 
 const Display = styled.div`
@@ -205,29 +150,30 @@ const Display = styled.div`
   flex-direction: column;
   gap: 5px;
   height: 100%;
-  width: 940px;
+  width: 100%;
+  align-items: center;
   padding: 20px;
-  margin: 60px 0 91px;
+  margin: 0 0 81px;
   overflow-y: auto;
-  @media only screen and (max-width: 980px) {
-    width: 100%;
-  }
   .Me {
     align-items: flex-end;
   }
-  .Chatbot {
+  .AI {
     text-align: flex-start;
   }
 `;
 
 const InputWrap = styled.div`
   width: 100%;
-  padding: 5px 20px 5px;
   height: fit-content;
   display: flex;
   justify-content: center;
   position: fixed;
   bottom: 0;
+  background-image: linear-gradient(to top, white, white, transparent);
+  @media only screen and (max-width: 940px) {
+    width: 100%;
+  }
 `;
 
 const Message = styled.div`
@@ -235,28 +181,34 @@ const Message = styled.div`
   flex-direction: column;
   height: fit-content;
   color: gray;
+  width: 900px;
+  padding-left: 8px;
+  @media only screen and (max-width: 940px) {
+    width: 100%;
+  }
   p {
     margin: 0;
   }
   .Me {
-    border-radius: 10px 10px 0px 10px;
+    border-radius: 25px 25px 5px 25px;
     background-color: #0157f9;
     color: white;
   }
-  .Chatbot {
-    border-radius: 10px 10px 10px 0px;
-    background-color: white;
+  .AI {
+    border-radius: 25px 25px 25px 5px;
+    background-color: #ffffff;
     color: black;
   }
 `;
+
+const User = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
 const TextBubble = styled.div`
   height: fit-content;
   width: fit-content;
   padding: 10px 20px;
-`;
-
-const StyledIcon = styled(Icon)`
-  fill: white;
-  display: flex;
-  align-items: center;
 `;
