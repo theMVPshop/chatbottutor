@@ -5,8 +5,12 @@ import url from "url";
 import "dotenv/config";
 import OpenAI from "openai";
 import axios from "axios";
+import chatRouter from "./server/routes/chat";
 
-export const openai = new OpenAI();
+
+export const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+});
 
 const app = express();
 
@@ -17,6 +21,8 @@ const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(express.static(path.join(__dirname, './client/dist')));
+
+app.use("/api/chat", chatRouter);
 
 app.get('*', function (_req, res) {
   res.sendFile(path.join(__dirname, './client/dist/index.html'), function (err) {
