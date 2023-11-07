@@ -6,15 +6,14 @@ import "../App.css";
 import AppBar from "./AppBar.jsx";
 
 function Chat() {
-
   const [currentResponse, setCurrentResponse] = useState("");
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "gpt"}]
   const [gptComplete, setGptComplete] = useState(true);
 
   function sendGPTRequest(prompt) {
-    socket.emit('gpt-request', { prompt });
-    console.log(socket.connected)
+    socket.emit("gpt-request", { prompt });
+    console.log(socket.connected);
   }
 
   function handleMessageInputChange(e) {
@@ -25,7 +24,7 @@ function Chat() {
     e.preventDefault();
     setMessages((prevMessages) => [
       ...prevMessages,
-      { text: messageInput, sender: "user" },
+      { text: messageInput, sender: "Me" },
     ]);
     setGptComplete(false);
     sendGPTRequest(messageInput);
@@ -33,18 +32,17 @@ function Chat() {
   }
 
   useEffect(() => {
-
     function onConnect() {
-      console.log('Connected!');
+      console.log("Connected!");
     }
 
     function onDisconnect() {
-      console.log('Disconnected!');
+      console.log("Disconnected!");
     }
 
     function onGptResponse(data) {
       console.log(data);
-      setCurrentResponse(prevData => prevData + data);
+      setCurrentResponse((prevData) => prevData + data);
     }
 
     function onGptComplete() {
@@ -52,21 +50,21 @@ function Chat() {
     }
 
     function onGptError(error) {
-      console.error('Received a GPT error:', error);
+      console.error("Received a GPT error:", error);
     }
 
-    socket.on('gpt-response', onGptResponse);
-    socket.on('gpt-complete', onGptComplete);
-    socket.on('gpt-error', onGptError);
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
+    socket.on("gpt-response", onGptResponse);
+    socket.on("gpt-complete", onGptComplete);
+    socket.on("gpt-error", onGptError);
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
 
     return () => {
-      socket.off('gpt-response', onGptResponse);
-      socket.off('connect', onConnect);
-      socket.off('gpt-complete', onGptComplete);
-      socket.off('gpt-error', onGptError);
-      socket.off('disconnect', onDisconnect);
+      socket.off("gpt-response", onGptResponse);
+      socket.off("connect", onConnect);
+      socket.off("gpt-complete", onGptComplete);
+      socket.off("gpt-error", onGptError);
+      socket.off("disconnect", onDisconnect);
     };
   }, []);
 
@@ -74,13 +72,16 @@ function Chat() {
     if (!currentResponse) {
       return;
     }
-    setMessages(prevMessages => {
+    setMessages((prevMessages) => {
       const newMessages = [...prevMessages];
 
-      if (newMessages.length > 0 && newMessages[newMessages.length - 1].sender === 'gpt') {
+      if (
+        newMessages.length > 0 &&
+        newMessages[newMessages.length - 1].sender === "AI Tutor"
+      ) {
         newMessages[newMessages.length - 1].text = currentResponse;
       } else {
-        newMessages.push({ text: currentResponse, sender: 'gpt' });
+        newMessages.push({ text: currentResponse, sender: "AI Tutor" });
       }
 
       return newMessages;
@@ -89,7 +90,10 @@ function Chat() {
 
   useEffect(() => {
     if (gptComplete) {
-      if (messages[messages.length - 1]?.text === currentResponse && messages[messages.length - 1]?.sender === 'gpt') {
+      if (
+        messages[messages.length - 1]?.text === currentResponse &&
+        messages[messages.length - 1]?.sender === "gpt"
+      ) {
         setCurrentResponse("");
       }
     }
