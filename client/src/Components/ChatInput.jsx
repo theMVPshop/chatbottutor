@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Icon } from "@blueprintjs/core";
 
-const ChatInput = ({ messageInput, handleMessageInputChange, onSend }) => {
+const ChatInput = ({ messageInput, handleMessageInputChange, onSend, gptComplete }) => {
   return (
     <SearchWrapper>
       <SearchInput>
@@ -11,7 +11,7 @@ const ChatInput = ({ messageInput, handleMessageInputChange, onSend }) => {
           placeholder="How can I help you?"
           value={messageInput}
         />
-        {!messageInput ? (
+        {!messageInput || !gptComplete ? (
           <DisabledBtn disabled={true}>
             <StyledIcon icon="send-message" size={20} />
           </DisabledBtn>

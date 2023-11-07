@@ -46,10 +46,14 @@ io.on('connection', (socket) => {
       });
       for await (const chunk of stream) {
         socket.emit('gpt-response', chunk.choices[0]?.delta?.content || '');
+        console.log('GPT response:', chunk.choices[0]?.delta?.content || '');
       }
     } catch (error) {
       console.error('Error with GPT request:', error);
       socket.emit('gpt-error', 'Error processing your request');
+    }
+    finally {
+      socket.emit('gpt-complete', 'The GPT stream has completed.');
     }
   });
 
