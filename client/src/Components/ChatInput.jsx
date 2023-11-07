@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Icon } from "@blueprintjs/core";
 
-const ChatInput = ({ messageInput, handleMessageInputChange, onSend }) => {
+const ChatInput = ({ messageInput, handleMessageInputChange, onSend, gptComplete }) => {
   return (
     <MainWrap>
       <SearchWrapper>
