@@ -8,7 +8,7 @@ import AppBar from "./AppBar.jsx";
 function Chat() {
   const [currentResponse, setCurrentResponse] = useState("");
   const [messageInput, setMessageInput] = useState("");
-  const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "gpt"}]
+  const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "AI Tutor"}]
   const [gptComplete, setGptComplete] = useState(true);
 
   function sendGPTRequest(prompt) {
@@ -92,7 +92,7 @@ function Chat() {
     if (gptComplete) {
       if (
         messages[messages.length - 1]?.text === currentResponse &&
-        messages[messages.length - 1]?.sender === "gpt"
+        messages[messages.length - 1]?.sender === "AI Tutor"
       ) {
         setCurrentResponse("");
       }
