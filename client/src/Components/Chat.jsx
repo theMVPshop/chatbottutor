@@ -153,6 +153,7 @@ function Chat() {
           messageInput={messageInput}
           handleMessageInputChange={handleMessageInputChange}
           onSend={onSend}
+          gptComplete={gptComplete}
         />
       </InputWrap>
     </ChatWrap>
