@@ -4,6 +4,8 @@ import styled from "styled-components";
 import { socket } from "../socket.js";
 import "../App.css";
 import AppBar from "./AppBar.jsx";
+import { animateScroll as scroll } from "react-scroll";
+import { debounce } from "lodash";
 
 function Chat() {
   const [currentResponse, setCurrentResponse] = useState("");
@@ -22,6 +24,7 @@ function Chat() {
 
   function onSend(e) {
     e.preventDefault();
+    scrollToBottom();
     setMessages((prevMessages) => [
       ...prevMessages,
       { text: messageInput, sender: "Me" },
@@ -41,7 +44,6 @@ function Chat() {
     }
 
     function onGptResponse(data) {
-      console.log(data);
       setCurrentResponse((prevData) => prevData + data);
     }
 
@@ -99,20 +101,39 @@ function Chat() {
     }
   }, [gptComplete, messages, currentResponse]);
 
-  const messagesEndRef = useRef(null);
+  const messagesRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const scrollTop = document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight;
+    const clientHeight = window.innerHeight;
+
+    console.log(scrollHeight - (scrollTop + clientHeight));
+
+    const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 75;
+    if (isScrolledToBottom) {
+      scroll.scrollToBottom({duration: 10});
+    }
   };
 
+  const debouncedScrollToBottom = debounce(scrollToBottom, 100);
+
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (!messagesRef.current) return;
+    console.log("scrolling")
+    debouncedScrollToBottom();
+  }, [messagesRef.current?.scrollHeight]);
+
+  useEffect(() => {
+    return () => {
+      debouncedScrollToBottom.cancel();
+    };
+  }, []);
 
   return (
     <ChatWrap className="chat-container">
       <AppBar />
-      <Display className="messages-container">
+      <Display ref={messagesRef} className="messages-container">
         {messages.map((message, index) => {
           return (
             <Message key={index} className={`${message.sender}`}>
@@ -126,7 +147,6 @@ function Chat() {
             </Message>
           );
         })}
-        <div ref={messagesEndRef} />
       </Display>
       <InputWrap>
         <ChatInput
