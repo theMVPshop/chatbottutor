@@ -1,20 +1,28 @@
 import styled from "styled-components";
 import logo from "../Assets/logo-dark.webp";
+import { Link } from "react-router-dom";
 
 function AppBar() {
   return (
     <AppWrap>
       <Content>
-        <Logo>
-          <img style={{height: "100%"}} src={logo} />
-        </Logo>
-        <Title>
-          <h1>AI Tutor</h1>
-          <StatusWrapper>
-            <div></div>
-            <p>Online</p>
-          </StatusWrapper>
-        </Title>
+        <Tag>
+          <Logo>
+            <img style={{height: "100%"}} src={logo} />
+          </Logo>
+          <Title>
+            <h1>AI Tutor</h1>
+            <StatusWrapper>
+              <div></div>
+              <p>Online</p>
+            </StatusWrapper>
+          </Title>
+        </Tag>
+        <Menu>
+          <Link to="/admin" target="_blank">
+            <AdminBtn>Admin</AdminBtn>
+          </Link>
+        </Menu>
       </Content>
     </AppWrap>
   );
@@ -38,12 +46,37 @@ const AppWrap = styled.div`
 const Content = styled.div`
   padding: 0 20px;
   display: flex;
-  gap: 10px;
-  align-items: center;
   width: 940px;
+  justify-content: space-between;
+  align-items: center;
   @media only screen and (max-width: 940px) {
     width: 100%;
   }
+`;
+
+const Tag = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+`;
+
+const AdminBtn = styled.button`
+  padding: 5px 10px;
+  background-color: transparent;
+  border: 1px solid #0157f9;
+  border-radius: 5px;
+  color: #0157f9;
+  transition: ease-in-out 0.15s;
+  &:hover {
+    color: #fff;
+    background-color: #0157f9;
+  }
+`;
+
+const Menu = styled.div`
+  display: flex;
+  align-items: center;
+  height: fit-content;
 `;
 
 const Logo = styled.div`
