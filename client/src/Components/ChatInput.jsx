@@ -14,7 +14,7 @@ const ChatInput = ({ messageInput, handleMessageInputChange, onSend, gptComplete
             placeholder="Ask a question"
             value={messageInput}
           />
-          {!messageInput ? (
+          {!messageInput || !gptComplete ? (
             <SubmitBtn disabled={true}>
               <DisabledIcon icon="send-message" size={20} />
             </SubmitBtn>

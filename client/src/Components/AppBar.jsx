@@ -6,7 +6,7 @@ function AppBar() {
     <AppWrap>
       <Content>
         <Logo>
-          <img src={logo} />
+          <img style={{height: "100%"}} src={logo} />
         </Logo>
         <Title>
           <h1>AI Tutor</h1>
