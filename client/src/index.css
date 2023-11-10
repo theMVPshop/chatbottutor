@@ -4,11 +4,6 @@
   box-sizing: border-box;
 }
 
-body {
-  height: 100vh;
-  height: 100dvh;
-}
-
 /* Remove default list styles */
 ul,
 ol {
@@ -26,4 +21,8 @@ body {
   font-size: 16px;
   line-height: 1.5;
   height: 100%;
+}
+
+.testChat {
+  height:auto;
 }

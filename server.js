@@ -10,7 +10,11 @@ import chatRouter from "./server/routes/chat.js";
 import { Server } from "socket.io";
 import { createServer } from 'http';
 
-export const openai = new OpenAI();
+
+export const openai = new OpenAI({
+  apiKey: process.env.API_KEY
+});
+
 const app = express();
 
 app.use(cors());
