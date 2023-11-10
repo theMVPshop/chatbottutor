@@ -23,13 +23,12 @@ export default Insights;
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100vh - 100px);
   width: 100%;
-  ul {
-    padding: 20px;
-    li {
-      height: fit-content;
-    }
+  padding: 20px;
+  gap: 20px;
+  @media only screen and (min-width: 1614px) {
+    height: calc(100vh - 100px);
   }
 `;
 
@@ -38,6 +37,6 @@ const IframeTestWrap = styled.div`
   bottom: 50px;
   right: 50px;
   height: 500px;
-  width: 600px;
+  width: 350px;
   border: 1px solid lightgray;
 `;
