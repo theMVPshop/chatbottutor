@@ -8,7 +8,7 @@ function AppBar() {
       <Content>
         <Tag>
           <Logo>
-            <img src={logo} />
+            <img style={{height: "100%"}} src={logo} />
           </Logo>
           <Title>
             <h1>AI Tutor</h1>
