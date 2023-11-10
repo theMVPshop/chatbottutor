@@ -1,37 +1,61 @@
+/* eslint-disable react/prop-types */
 import styled from "styled-components";
 import Counter from "./Reuseables/Counter";
 import DataGraph from "./Reuseables/DataGraph";
 import QuerryTopicList from "./Reuseables/QuerryTopicList";
 import UnitGraph from "./Reuseables/UnitGraph";
 
-// eslint-disable-next-line react/prop-types
-const Overview = ({ searchQuery }) => {
+const Overview = ({ searchQuery, data }) => {
+  // Function to identify the number of querries
+  const querries = data.length;
+
+  // Function to identify the number of unique sessions
+  function countUniqueSessions(input) {
+    const uniqueSessions = new Set();
+    input.forEach((entry) => {
+      const sessionKey = `${entry.user}-${entry.date}-${entry.session}`;
+      uniqueSessions.add(sessionKey);
+    });
+    return uniqueSessions.size;
+  }
+  const numberOfUniqueSessions = countUniqueSessions(data);
+
+  // Use Set to store unique users & Get the count of unique users
+  const uniqueUsers = new Set(data.map((entry) => entry.user));
+  const numberOfUniqueUsers = uniqueUsers.size;
+
+  // Function to count the total number of stars
+  function countTotalStars(input) {
+    return input.reduce((count, entry) => count + (entry.star ? 1 : 0), 0);
+  }
+  const totalStars = countTotalStars(data);
+
   return (
     <Wrapper>
       <CounterContainer id="row1A">
         <CounterSubContainer>
-          <Counter icon="help" title="Total Querries" data="25,976" />
-          <Counter icon="user" title="Total Users" data="362" />
+          <Counter icon="help" title="Total Querries" data={querries} />
+          <Counter icon="user" title="Total Users" data={numberOfUniqueUsers} />
         </CounterSubContainer>
         <CounterSubContainer>
           <Counter
             icon="predictive-analysis"
             title="Total Sessions"
-            data="2895"
+            data={numberOfUniqueSessions}
           />
-          <Counter icon="star" title="Starred solution" data="1546" />
+          <Counter icon="star" title="Starred solution" data={totalStars} />
         </CounterSubContainer>
       </CounterContainer>
       <GraphContainer id="row2A">
         <DataGraphContainer>
-          <DataGraph />
+          <DataGraph data={data} />
         </DataGraphContainer>
         <UnitGraphContainer>
-          <UnitGraph />
+          <UnitGraph data={data} />
         </UnitGraphContainer>
       </GraphContainer>
       <ListContainer id="row3A">
-        <QuerryTopicList searchQuery={searchQuery} />
+        <QuerryTopicList searchQuery={searchQuery} data={data} />
       </ListContainer>
     </Wrapper>
   );

@@ -3,10 +3,13 @@ import AdminNav from "./AdminNav";
 import { useState } from "react";
 import Overview from "./Overview";
 import Insights from "./Insights";
+import fakedata from "../../Data/FakeData.json";
 
 // eslint-disable-next-line react/prop-types
 const Dashboard = ({ selectedTab }) => {
   const [searchQuery, setSearchQuery] = useState("");
+
+  const data = fakedata;
 
   return (
     <Wrapper>
@@ -15,7 +18,9 @@ const Dashboard = ({ selectedTab }) => {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
-      {selectedTab === "Overview" && <Overview searchQuery={searchQuery} />}
+      {selectedTab === "Overview" && (
+        <Overview searchQuery={searchQuery} data={data} />
+      )}
       {selectedTab === "Insights" && <Insights searchQuery={searchQuery} />}
     </Wrapper>
   );

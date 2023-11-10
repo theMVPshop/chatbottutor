@@ -1,8 +1,8 @@
+/* eslint-disable react/prop-types */
 import styled from "styled-components";
 import { Icon } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 
-// eslint-disable-next-line react/prop-types
 const ListItem = ({ index, content }) => {
   const [clr, setClr] = useState("");
 
@@ -22,7 +22,7 @@ const ListItem = ({ index, content }) => {
         <h1>{index + 1}</h1>
       </IconWrap>
       <Content>
-        <h3>{content}</h3>
+        <h3>{content.question}</h3>
       </Content>
     </Wrapper>
   );

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import styled from "styled-components";
 import React, { PureComponent } from "react";
 import {
@@ -12,49 +13,47 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  {
-    name: "111",
-    uv: 4000,
-    pv: 2400,
-    amt: 2400,
-  },
-  {
-    name: "211",
-    uv: 3000,
-    pv: 1398,
-    amt: 2210,
-  },
-  {
-    name: "311",
-    uv: 2000,
-    pv: 9800,
-    amt: 2290,
-  },
-  {
-    name: "411",
-    uv: 2780,
-    pv: 3908,
-    amt: 2000,
-  },
-  {
-    name: "511",
-    uv: 1890,
-    pv: 4800,
-    amt: 2181,
-  },
-];
-// eslint-disable-next-line react/prop-types
-const UnitGraph = () => {
+const UnitGraph = ({ data }) => {
+  // Function to determine the number of questions per unit
+  function questionsPerUnit(data) {
+    const unitQuestionCountMap = new Map();
+
+    data.forEach((entry) => {
+      const unit = entry.unit;
+
+      if (unitQuestionCountMap.has(unit)) {
+        // Increment the count for an existing unit
+        unitQuestionCountMap.set(unit, unitQuestionCountMap.get(unit) + 1);
+      } else {
+        // Initialize the count for a new unit
+        unitQuestionCountMap.set(unit, 1);
+      }
+    });
+
+    // Convert the Map to an array of objects
+    const resultArray = Array.from(
+      unitQuestionCountMap,
+      ([unit, questionCount]) => {
+        return { name: unit, uv: questionCount };
+      }
+    );
+
+    return resultArray;
+  }
+
+  // Call the function and log the result
+  const result = questionsPerUnit(data);
+
   return (
     <Wrapper>
       <Title>
         <h3>Unit Graph</h3>
       </Title>
       <ResponsiveContainer width="99%" height="99%">
-        <BarChart width={150} height={40} data={data}>
+        <BarChart width={150} height={40} data={result}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
+          <YAxis />
           <Bar dataKey="uv" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>
