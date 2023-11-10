@@ -1,19 +1,33 @@
+/* eslint-disable react/prop-types */
 import styled from "styled-components";
 import ListItem from "./ListItem";
 
-const fakedata = [
-  "react",
-  "Javascript",
-  "MUI",
-  "css",
-  "sass",
-  "node",
-  "express",
-  "git",
-  "npm",
-];
 // eslint-disable-next-line react/prop-types
-const QuerryTopicList = ({ searchQuery }) => {
+const QuerryTopicList = ({ searchQuery, data }) => {
+  function getTopQuestions(data) {
+    const questionCount = {};
+
+    // Count the occurrences of each question
+    data.forEach((entry) => {
+      const question = entry.question;
+      questionCount[question] = (questionCount[question] || 0) + 1;
+    });
+
+    // Convert the questionCount object to an array of objects
+    const questionArray = Object.keys(questionCount).map((question) => ({
+      question: question,
+      count: questionCount[question],
+    }));
+
+    // Sort the array in descending order based on question count
+    questionArray.sort((a, b) => b.count - a.count);
+
+    // Return the top 15 questions
+    return questionArray.slice(0, 15);
+  }
+
+  const topQuestions = getTopQuestions(data);
+
   return (
     <Wrapper>
       <Title>
@@ -21,19 +35,21 @@ const QuerryTopicList = ({ searchQuery }) => {
       </Title>
       <Display>
         <ul>
-          {fakedata.length
-            ? fakedata
+          {topQuestions.length
+            ? topQuestions
                 .filter((listItem) => {
                   if (searchQuery === "" || searchQuery === undefined) {
                     return listItem;
                   } else if (
-                    listItem.toLowerCase().includes(searchQuery.toLowerCase())
+                    listItem.question
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase())
                   ) {
                     return listItem;
                   }
                 })
                 .map((item, index) => (
-                  <ListItem key={item} index={index} content={item} />
+                  <ListItem key={index} index={index} content={item} />
                 ))
             : null}
         </ul>

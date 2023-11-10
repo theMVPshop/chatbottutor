@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import styled from "styled-components";
 import {
   LineChart,
@@ -10,82 +11,55 @@ import {
   Legend,
 } from "recharts";
 
-const data = [
-  {
-    name: "Jan",
-    cohort_1: 4000,
-    cohort_2: 2400,
-    cohort_3: 2400,
-  },
-  {
-    name: "Feb",
-    cohort_1: 3000,
-    cohort_2: 1398,
-    cohort_3: 2210,
-  },
-  {
-    name: "Mar",
-    cohort_1: 2000,
-    cohort_2: 9800,
-    cohort_3: 2290,
-  },
-  {
-    name: "Apr",
-    cohort_1: 2780,
-    cohort_2: 3908,
-    cohort_3: 2000,
-  },
-  {
-    name: "May",
-    cohort_1: 1890,
-    cohort_2: 4800,
-    cohort_3: 2181,
-  },
-  {
-    name: "Jun",
-    cohort_1: 2390,
-    cohort_2: 3800,
-    cohort_3: 2500,
-  },
-  {
-    name: "Jul",
-    cohort_1: 3490,
-    cohort_2: 4300,
-    cohort_3: 2100,
-  },
-  {
-    name: "Aug",
-    cohort_1: 3490,
-    cohort_2: 4300,
-    cohort_3: 2700,
-  },
-  {
-    name: "Sep",
-    cohort_1: 3490,
-    cohort_2: 4300,
-    cohort_3: 3500,
-  },
-  {
-    name: "Oct",
-    cohort_1: 2490,
-    cohort_2: 6800,
-    cohort_3: 5700,
-  },
-  {
-    name: "Nov",
-    cohort_1: 3490,
-    cohort_2: 5700,
-    cohort_3: 3500,
-  },
-  {
-    name: "Dec",
-    cohort_1: 3490,
-    cohort_2: 4300,
-    cohort_3: 2100,
-  },
-];
+const DataGraph = ({ data }) => {
+  // Function to map months and the number of questions for each cohort
+  function mapMonthsToCohortsQuestions(data) {
+    const monthOrder = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
 
-const DataGraph = () => {
+    const monthCohortsQuestionMap = new Map();
+
+    data.forEach((entry) => {
+      const date = new Date(entry.date);
+      const month = date.toLocaleString("en-US", { month: "short" });
+      const cohortKey = `cohort_${entry.cohort}`;
+
+      if (!monthCohortsQuestionMap.has(month)) {
+        // Initialize the count for a new month
+        monthCohortsQuestionMap.set(month, { name: month });
+      }
+
+      // Increment the count for the cohort in the existing month
+      monthCohortsQuestionMap.get(month)[cohortKey] =
+        (monthCohortsQuestionMap.get(month)[cohortKey] || 0) + 1;
+    });
+
+    // Convert the Map to an array of objects
+    const resultArray = Array.from(monthCohortsQuestionMap.values());
+
+    // Sort the array based on the custom order of months
+    resultArray.sort(
+      (a, b) => monthOrder.indexOf(a.name) - monthOrder.indexOf(b.name)
+    );
+
+    return resultArray;
+  }
+
+  // Call the function and log the result
+  const resultArray = mapMonthsToCohortsQuestions(data);
+
   return (
     <Wrapper>
       <Title>
@@ -95,7 +69,7 @@ const DataGraph = () => {
         <LineChart
           width={500}
           height={400}
-          data={data}
+          data={resultArray}
           margin={{
             top: 10,
             right: 30,
