@@ -16,7 +16,7 @@ const Sidebar = ({ selectedTab, setSelectedTab }) => {
     <Wrapper>
       <Tag>
         <Logo>
-          <img src={logo} />
+          <img style={{ height: "100%" }} src={logo} />
         </Logo>
         <Title>
           <h1>AI Tutor</h1>
@@ -52,7 +52,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   gap: 50px;
   padding: 20px 0;
-  height: 100%;
+  height: 100vh;
   width: 250px;
   min-width: 250px;
   background-color: #fff;
