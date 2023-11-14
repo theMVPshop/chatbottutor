@@ -32,13 +32,14 @@ export const aiTutor = async (req, res) => {
 
 export const reply = async (req, res) => {
     const { message } = req.body;
+    console.log("reply was hit")
     //TODO: Implement GPT Logic
     res.send({ reply: 'Bot reply goes here' })
-}
+};
 
 export const send = async (req, res) => {
     const { message } = req.body;
-
+    console.log("send was hit")
     try {
         const response = await openai.chat.completions.create({
             model: "gpt-4",

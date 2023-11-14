@@ -13,8 +13,9 @@ function Chat() {
   const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "AI Tutor"}]
   const [gptComplete, setGptComplete] = useState(true);
 
+
   function sendGPTRequest(prompt) {
-    socket.emit("gpt-request", { prompt });
+    socket.emit("gpt-request", prompt );
     console.log(socket.connected);
   }
 
@@ -23,15 +24,24 @@ function Chat() {
   }
 
   function onSend(e) {
+    const newMessage = { role: "user", content: messageInput }
     e.preventDefault();
     scrollToBottom();
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { text: messageInput, sender: "Me" },
-    ]);
+    // setMessages((prevMessages) => [        **
+    //   ...prevMessages,
+    //   { text: messageInput, sender: "Me" },
+    // ]);
+    // setMessages([
+    //   ...messages,
+    //   newMessage, //Save previous content and add current content
+    // ])
+    
     setGptComplete(false);
-    sendGPTRequest(messageInput);
-    setMessageInput("");
+    sendGPTRequest([{
+      message : messages,
+      newMessage
+  }]); //Send the current subsequent conversation to AI
+    setMessageInput(""); //Clear the current users input for next input
   }
 
   useEffect(() => {
@@ -44,7 +54,11 @@ function Chat() {
     }
 
     function onGptResponse(data) {
-      setCurrentResponse((prevData) => prevData + data);
+      // setCurrentResponse((prevData) => prevData + data);
+      setMessages([
+        ...messages,
+        { role: "assistant", content: data} //Add New Response into conversations state
+      ])
     }
 
     function onGptComplete() {
@@ -70,36 +84,36 @@ function Chat() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!currentResponse) {
-      return;
-    }
-    setMessages((prevMessages) => {
-      const newMessages = [...prevMessages];
+  // useEffect(() => {
+  //   if (!currentResponse) {
+  //     return;
+  //   }
+  //   setMessages((prevMessages) => {
+  //     const newMessages = [...prevMessages];
 
-      if (
-        newMessages.length > 0 &&
-        newMessages[newMessages.length - 1].sender === "AI Tutor"
-      ) {
-        newMessages[newMessages.length - 1].text = currentResponse;
-      } else {
-        newMessages.push({ text: currentResponse, sender: "AI Tutor" });
-      }
+  //     if (
+  //       newMessages.length > 0 &&
+  //       newMessages[newMessages.length - 1].sender === "AI Tutor"
+  //     ) {
+  //       newMessages[newMessages.length - 1].text = currentResponse;
+  //     } else {
+  //       newMessages.push({ text: currentResponse, sender: "AI Tutor" });
+  //     }
 
-      return newMessages;
-    });
-  }, [currentResponse]);
+  //     return newMessages;
+  //   });
+  // }, [currentResponse]);
 
-  useEffect(() => {
-    if (gptComplete) {
-      if (
-        messages[messages.length - 1]?.text === currentResponse &&
-        messages[messages.length - 1]?.sender === "AI Tutor"
-      ) {
-        setCurrentResponse("");
-      }
-    }
-  }, [gptComplete, messages, currentResponse]);
+  // useEffect(() => {
+  //   if (gptComplete) {
+  //     if (
+  //       messages[messages.length - 1]?.text === currentResponse &&
+  //       messages[messages.length - 1]?.sender === "AI Tutor"
+  //     ) {
+  //       setCurrentResponse("");
+  //     }
+  //   }
+  // }, [gptComplete, messages, currentResponse]);
 
   const messagesRef = useRef(null);
 
@@ -136,13 +150,13 @@ function Chat() {
       <Display ref={messagesRef} className="messages-container">
         {messages.map((message, index) => {
           return (
-            <Message key={index} className={`${message.sender}`}>
+            <Message key={index} className={`${message.sender}`} >
               <User>
                 <p>{message.sender}</p>
               </User>
 
               <TextBubble className={`${message.sender}`}>
-                <p>{message.text}</p>
+                <p>{message.text}</p>*
               </TextBubble>
             </Message>
           );
