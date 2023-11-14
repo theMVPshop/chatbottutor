@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import styled from "styled-components";
-import { Icon } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 
 const ListItem = ({ index, content }) => {
