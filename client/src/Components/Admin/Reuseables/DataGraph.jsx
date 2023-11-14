@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import styled from "styled-components";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -12,9 +12,9 @@ import {
 } from "recharts";
 
 const DataGraph = ({ data }) => {
-  // Function to map months and the number of questions for each cohort
-  function mapMonthsToCohortsQuestions(data) {
-    const monthOrder = [
+  function getQuestionsPerMonth(data) {
+    const questionsPerMonth = {};
+    const months = [
       "Jan",
       "Feb",
       "Mar",
@@ -29,68 +29,108 @@ const DataGraph = ({ data }) => {
       "Dec",
     ];
 
-    const monthCohortsQuestionMap = new Map();
+    // Helper function to get abbreviated month name
+    function getAbbreviatedMonthName(date) {
+      const monthIndex = new Date(date).getMonth();
+      return months[monthIndex];
+    }
 
+    // Iterate through the dataset
     data.forEach((entry) => {
-      const date = new Date(entry.date);
-      const month = date.toLocaleString("en-US", { month: "short" });
-      const cohortKey = `cohort_${entry.cohort}`;
+      const month = getAbbreviatedMonthName(entry.date);
 
-      if (!monthCohortsQuestionMap.has(month)) {
-        // Initialize the count for a new month
-        monthCohortsQuestionMap.set(month, { name: month });
+      // If the month key doesn't exist, create an empty object for it
+      if (!questionsPerMonth[month]) {
+        questionsPerMonth[month] = {};
       }
 
-      // Increment the count for the cohort in the existing month
-      monthCohortsQuestionMap.get(month)[cohortKey] =
-        (monthCohortsQuestionMap.get(month)[cohortKey] || 0) + 1;
+      const cohort = `cohort_${entry.cohort}`;
+
+      // If the cohort key doesn't exist for the month, create it and initialize the count to 1
+      if (!questionsPerMonth[month][cohort]) {
+        questionsPerMonth[month][cohort] = 1;
+      } else {
+        // If the cohort key already exists for the month, increment the count
+        questionsPerMonth[month][cohort]++;
+      }
     });
 
-    // Convert the Map to an array of objects
-    const resultArray = Array.from(monthCohortsQuestionMap.values());
+    // Extract all unique cohorts across all months
+    const allCohorts = [
+      ...new Set(data.map((entry) => `cohort_${entry.cohort}`)),
+    ];
 
-    // Sort the array based on the custom order of months
-    resultArray.sort(
-      (a, b) => monthOrder.indexOf(a.name) - monthOrder.indexOf(b.name)
-    );
+    // Convert the questionsPerMonth object to an array of objects with the specified format
+    const resultArray = months.map((month) => {
+      const monthObject = { name: month };
+
+      // Populate the cohort counts for the month, including cohorts with 0 questions
+      allCohorts.forEach((cohort) => {
+        monthObject[cohort] = questionsPerMonth[month][cohort] || 0;
+      });
+
+      return monthObject;
+    });
 
     return resultArray;
   }
 
-  // Call the function and log the result
-  const resultArray = mapMonthsToCohortsQuestions(data);
+  const questionsPerMonthArray = getQuestionsPerMonth(data);
+  console.log(questionsPerMonthArray);
 
   return (
     <Wrapper>
       <Title>
-        <h3>Query Graph Analysis</h3>
+        <h3>Cohort Query Analysis</h3>
       </Title>
       <ResponsiveContainer width="99%" height="99%">
-        <LineChart
-          width={500}
-          height={400}
-          data={resultArray}
-          margin={{
-            top: 10,
-            right: 30,
-            left: 0,
-            bottom: 0,
-          }}
+        <AreaChart
+          width={730}
+          height={250}
+          data={questionsPerMonthArray}
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
         >
-          {/* <Tooltip /> */}
+          <defs>
+            <linearGradient id="color1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="color2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="color3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#FFC962" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#FFC962" stopOpacity={0} />
+            </linearGradient>
+          </defs>
           <Legend />
-          <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
-          <Line
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Area
             type="monotone"
             dataKey="cohort_1"
             stroke="#8884d8"
-            activeDot={{ r: 8 }}
+            fillOpacity={1}
+            fill="url(#color1)"
           />
-          <Line type="monotone" dataKey="cohort_2" stroke="#82ca9d" />
-          <Line type="monotone" dataKey="cohort_3" stroke="#ffc658" />
-        </LineChart>
+          <Area
+            type="monotone"
+            dataKey="cohort_2"
+            stroke="#82ca9d"
+            fillOpacity={1}
+            fill="url(#color2)"
+          />
+          <Area
+            type="monotone"
+            dataKey="cohort_3"
+            stroke="#FFC962"
+            fillOpacity={1}
+            fill="url(#color3)"
+          />
+        </AreaChart>
       </ResponsiveContainer>
     </Wrapper>
   );
@@ -111,10 +151,4 @@ const Wrapper = styled.div`
 
 const Title = styled.div`
   height: fit-content;
-`;
-
-const Tool = styled.div`
-  height: 40px;
-  width: 60px;
-  background-color: #fff;
 `;

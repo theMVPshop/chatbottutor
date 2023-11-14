@@ -1,15 +1,12 @@
 /* eslint-disable react/prop-types */
 import styled from "styled-components";
-import React, { PureComponent } from "react";
 import {
   BarChart,
   Bar,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 
@@ -34,7 +31,7 @@ const UnitGraph = ({ data }) => {
     const resultArray = Array.from(
       unitQuestionCountMap,
       ([unit, questionCount]) => {
-        return { name: unit, uv: questionCount };
+        return { name: unit, count: questionCount };
       }
     );
 
@@ -47,14 +44,15 @@ const UnitGraph = ({ data }) => {
   return (
     <Wrapper>
       <Title>
-        <h3>Unit Graph</h3>
+        <h3>Unit Query Graph</h3>
       </Title>
       <ResponsiveContainer width="99%" height="99%">
         <BarChart width={150} height={40} data={result}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
-          <Bar dataKey="uv" fill="#8884d8" />
+          <Tooltip />
+          <Bar dataKey="count" fill="#d58787" />
         </BarChart>
       </ResponsiveContainer>
     </Wrapper>
