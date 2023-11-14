@@ -1,12 +1,136 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { TagCloud } from 'react-tagcloud';
 
 // eslint-disable-next-line react/prop-types
 const Insights = () => {
+
+  const [tags, setTags] = useState([]);
+  const [hoveredTag, setHoveredTag] = useState(null);
+
+  useEffect(() => {
+
+    // get rid of this function when we have real data
+    const randomlyDuplicateItems = (items) => {
+      const result = [];
+
+      items.forEach(item => {
+        const duplicateTimes = Math.floor(Math.random() * 50);
+        for (let i = 0; i <= duplicateTimes; i++) {
+          result.push(item);
+        }
+      });
+
+      return result;
+    };
+
+    const convertToValueCountArray = (tags) => {
+      const result = [];
+
+      tags.forEach(tag => {
+        tag = tag.toLowerCase();
+        const existingTag = result.find(item => item.value === tag);
+
+        if (existingTag) {
+          existingTag.count++;
+        } else {
+          result.push({ value: tag, count: 1 });
+        }
+      });
+
+      return result;
+    };
+
+    // Example usage
+    const testTags = randomlyDuplicateItems([
+      "JavaScript",
+      "React",
+      "Node",
+      "express",
+      "database",
+      "sql",
+      "html",
+      "css",
+      "array",
+      "bootstrap",
+      "server",
+      "components",
+      "ui"
+    ]);
+
+    // testTags should be substituted with real data
+    const data = convertToValueCountArray(testTags);
+    setTags(data);
+
+  }, []);
+
+  const customRenderer = (tag, fontSize, color) => {
+    const isHovered = hoveredTag === tag.value;
+
+    return (
+      <span
+        key={tag.value}
+        style={{
+          margin: "0 0.5rem",
+          color,
+          fontSize,
+          display: 'inline-block',
+          width: 'auto',
+          whiteSpace: 'nowrap',
+          cursor: 'pointer',
+          zIndex: isHovered ? 1 : 0,
+        }}
+        className={`tag`}
+        onMouseEnter={() => setHoveredTag(tag.value)}
+        onMouseLeave={() => setHoveredTag(null)}>
+        <span
+          style={{
+            position: 'relative',
+            zIndex: 0,
+            opacity: 0.99
+          }}
+        >
+          {tag.value}
+          <span
+            style={{
+              position: 'absolute',
+              bottom: "-2.5rem",
+              left: 0,
+              fontSize: "0.8rem",
+              backgroundColor: "#666668",
+              padding: "0.5rem",
+              borderRadius: "0.5rem",
+              opacity: isHovered ? 1 : 0,
+              zIndex: isHovered ? 1 : 0,
+              transition: 'opacity .3s ease',
+              color: "white",
+            }}
+          >
+            Mentioned {tag.count} times
+          </span>
+        </span>
+      </span >
+    );
+  };
+
   return (
     <Wrapper>
       <ul>
         <li>summary of session with starred solution + lesson + cohort?</li>
         <li>summary of reoccuring questions within lessons?</li>
+        <TagsContainer>
+          <h3>Commonly Searched Words</h3>
+          <StyledTags
+            minSize={16}
+            maxSize={48}
+            tags={tags}
+            colorOptions={{
+              luminosity: 'light',
+              hue: 'blue'
+            }}
+            renderer={customRenderer}
+          />
+        </TagsContainer>
       </ul>
       <IframeTestWrap>
         <iframe
@@ -19,6 +143,20 @@ const Insights = () => {
 };
 
 export default Insights;
+
+const TagsContainer = styled.div`
+  text-align: center;
+  max-width: 25rem;
+  margin: 1rem;
+`;
+
+const StyledTags = styled(TagCloud)`
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  margin: 0.5rem;
+  background: #333338;
+`;
 
 const Wrapper = styled.div`
   display: flex;
