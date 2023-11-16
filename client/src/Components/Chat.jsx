@@ -6,11 +6,13 @@ import "../App.css";
 import AppBar from "./AppBar.jsx";
 import { animateScroll as scroll } from "react-scroll";
 import { debounce } from "lodash";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 function Chat() {
   const [currentResponse, setCurrentResponse] = useState("");
   const [messageInput, setMessageInput] = useState("");
-  const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "AI Tutor"}]
+  const [messages, setMessages] = useState([]);
   const [gptComplete, setGptComplete] = useState(true);
 
   function sendGPTRequest(prompt) {
@@ -31,8 +33,8 @@ function Chat() {
     setGptComplete(false);
     sendGPTRequest({
       message: messages,
-       newMessage
-    });    
+      newMessage
+    });
     setMessageInput("");
   }
 
@@ -85,7 +87,7 @@ function Chat() {
       ) {
         newMessages[newMessages.length - 1].content = currentResponse;
       } else {
-        newMessages.push({  role: "assistant", content: currentResponse});
+        newMessages.push({ role: "assistant", content: currentResponse });
       }
 
       return newMessages;
@@ -110,9 +112,7 @@ function Chat() {
     const scrollHeight = document.documentElement.scrollHeight;
     const clientHeight = window.innerHeight;
 
-    console.log(scrollHeight - (scrollTop + clientHeight));
-
-    const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 75;
+    const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 200;
     if (isScrolledToBottom) {
       scroll.scrollToBottom({ duration: 10 });
     }
@@ -122,7 +122,6 @@ function Chat() {
 
   useEffect(() => {
     if (!messagesRef.current) return;
-    console.log("scrolling");
     debouncedScrollToBottom();
   }, [messagesRef.current?.scrollHeight]);
 
@@ -132,25 +131,63 @@ function Chat() {
     };
   }, []);
 
-  console.log("Messages:", messages);
-  console.log("Current Response:", currentResponse);
+  const renderMessageContent = (message) => {
+    if (!message) return;
+
+    const segments = [];
+    let inCodeBlock = false;
+    let codeBlockContent = '';
+    let language = 'text';
+
+    message.split('\n').forEach((line, index) => {
+      if (line.startsWith('```') && !inCodeBlock) {
+        inCodeBlock = true;
+        const match = line.match(/```(\w*)/);
+        language = match[1] || 'text';
+        codeBlockContent = '';
+      } else if (line.startsWith('```') && inCodeBlock) {
+        inCodeBlock = false;
+        segments.push(
+          <SyntaxHighlighter language={language} style={tomorrow} key={`code-${index}`}>
+            {codeBlockContent}
+          </SyntaxHighlighter>
+        );
+      } else if (inCodeBlock) {
+        codeBlockContent += line + '\n';
+      } else {
+        segments.push(<span key={`text-${index}`}>{line}</span>, <br key={`br-${index}`} />);
+      }
+    });
+
+    if (inCodeBlock) {
+      segments.push(
+        <SyntaxHighlighter language={language} style={tomorrow} key={`code-incomplete`}>
+          {codeBlockContent}
+        </SyntaxHighlighter>
+      );
+    }
+
+    if (!inCodeBlock) {
+      segments.pop();
+    }
+
+    return segments;
+  };
+
   return (
     <ChatWrap className="chat-container">
       <AppBar />
       <Display ref={messagesRef} className="messages-container">
-        {messages.map((message, index) => {
-          return (
-            <Message key={index} className={`${message.role}`}>
-              <User>
-                <p>{message.role}</p>
-              </User>
-
-              <TextBubble className={`${message.role}`}>
-                <p>{message.content}</p>
-              </TextBubble>
-            </Message>
-          );
-        })}
+        {messages.map((message, index) => (
+          <Message key={index} className={`${message.role}`}>
+            <User>
+              <p>{message.role === 'user' ? 'Me' : 'AI Tutor'}</p>
+            </User>
+            <TextBubble className={`${message.role}`}>
+              <p>{renderMessageContent(message.content)}</p>
+            </TextBubble>
+          </Message>
+        ))}
       </Display>
       <InputWrap>
         <ChatInput

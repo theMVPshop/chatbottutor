@@ -34,3 +34,7 @@ body {
 .tag:hover {
   transform: scale(1.2);
 }
+
+pre {
+  border-radius: 0.5rem;
+}
