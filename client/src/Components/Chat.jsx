@@ -16,7 +16,7 @@ function Chat() {
   const [gptComplete, setGptComplete] = useState(true);
 
   function sendGPTRequest(prompt) {
-    socket.emit("gpt-request", { prompt });
+    socket.emit("gpt-request", prompt);
     console.log(socket.connected);
   }
 
@@ -26,13 +26,15 @@ function Chat() {
 
   function onSend(e) {
     e.preventDefault();
-    scrollToBottom();
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { text: messageInput, sender: "Me" },
-    ]);
+    const newMessage = { role: "user", content: messageInput };
+
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+
     setGptComplete(false);
-    sendGPTRequest(messageInput);
+    sendGPTRequest({
+      message: messages,
+       newMessage
+    });    
     setMessageInput("");
   }
 
@@ -81,11 +83,11 @@ function Chat() {
 
       if (
         newMessages.length > 0 &&
-        newMessages[newMessages.length - 1].sender === "AI Tutor"
+        newMessages[newMessages.length - 1].role === "assistant"
       ) {
-        newMessages[newMessages.length - 1].text = currentResponse;
+        newMessages[newMessages.length - 1].content = currentResponse;
       } else {
-        newMessages.push({ text: currentResponse, sender: "AI Tutor" });
+        newMessages.push({  role: "assistant", content: currentResponse});
       }
 
       return newMessages;
@@ -95,8 +97,8 @@ function Chat() {
   useEffect(() => {
     if (gptComplete) {
       if (
-        messages[messages.length - 1]?.text === currentResponse &&
-        messages[messages.length - 1]?.sender === "AI Tutor"
+        messages[messages.length - 1]?.content === currentResponse &&
+        messages[messages.length - 1]?.role === "assistant"
       ) {
         setCurrentResponse("");
       }
@@ -115,6 +117,7 @@ function Chat() {
     const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 75;
     if (isScrolledToBottom) {
       scroll.scrollToBottom({ duration: 10 });
+      scroll.scrollToBottom({ duration: 10 });
     }
   };
 
@@ -122,7 +125,7 @@ function Chat() {
 
   useEffect(() => {
     if (!messagesRef.current) return;
-    console.log("scrolling")
+    console.log("scrolling");
     debouncedScrollToBottom();
   }, [messagesRef.current?.scrollHeight]);
 
@@ -198,10 +201,10 @@ const Display = styled.div`
   padding: 20px;
   margin: 0 0 81px;
   overflow-y: auto;
-  .Me {
+  .user {
     align-items: flex-end;
   }
-  .AI {
+  .assistant {
     text-align: flex-start;
   }
 `;
@@ -232,12 +235,12 @@ const Message = styled.div`
   p {
     margin: 0;
   }
-  .Me {
+  .user {
     border-radius: 25px 25px 5px 25px;
     background-color: #0157f9;
     color: white;
   }
-  .AI {
+  .assistant {
     border-radius: 25px 25px 25px 5px;
     background-color: #ffffff;
     color: black;

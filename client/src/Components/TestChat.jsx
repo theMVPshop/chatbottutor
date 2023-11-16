@@ -9,10 +9,12 @@ function TestChat() {
     e.preventDefault();
     try {
       const newMessage = { role: "user", content: text };
+      //Sending the Request containing the conversation
       const response = await axios.post("http://localhost:3000/api/chat/openai", {
         conversation: conversations,
         newMessage,
       });
+      //Saving the Response
       setConversations([
         ...conversations,
         newMessage,
