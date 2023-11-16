@@ -13,9 +13,8 @@ function Chat() {
   const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "AI Tutor"}]
   const [gptComplete, setGptComplete] = useState(true);
 
-
   function sendGPTRequest(prompt) {
-    socket.emit("gpt-request", prompt );
+    socket.emit("gpt-request", prompt);
     console.log(socket.connected);
   }
 
@@ -24,24 +23,17 @@ function Chat() {
   }
 
   function onSend(e) {
-    const newMessage = { role: "user", content: messageInput }
     e.preventDefault();
-    scrollToBottom();
-    // setMessages((prevMessages) => [        **
-    //   ...prevMessages,
-    //   { text: messageInput, sender: "Me" },
-    // ]);
-    // setMessages([
-    //   ...messages,
-    //   newMessage, //Save previous content and add current content
-    // ])
-    
+    const newMessage = { role: "user", content: messageInput };
+
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+
     setGptComplete(false);
-    sendGPTRequest([{
-      message : messages,
-      newMessage
-  }]); //Send the current subsequent conversation to AI
-    setMessageInput(""); //Clear the current users input for next input
+    sendGPTRequest({
+      message: messages,
+       newMessage
+    });    
+    setMessageInput("");
   }
 
   useEffect(() => {
@@ -54,11 +46,7 @@ function Chat() {
     }
 
     function onGptResponse(data) {
-      // setCurrentResponse((prevData) => prevData + data);
-      setMessages([
-        ...messages,
-        { role: "assistant", content: data} //Add New Response into conversations state
-      ])
+      setCurrentResponse((prevData) => prevData + data);
     }
 
     function onGptComplete() {
@@ -84,36 +72,36 @@ function Chat() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (!currentResponse) {
-  //     return;
-  //   }
-  //   setMessages((prevMessages) => {
-  //     const newMessages = [...prevMessages];
+  useEffect(() => {
+    if (!currentResponse) {
+      return;
+    }
+    setMessages((prevMessages) => {
+      const newMessages = [...prevMessages];
 
-  //     if (
-  //       newMessages.length > 0 &&
-  //       newMessages[newMessages.length - 1].sender === "AI Tutor"
-  //     ) {
-  //       newMessages[newMessages.length - 1].text = currentResponse;
-  //     } else {
-  //       newMessages.push({ text: currentResponse, sender: "AI Tutor" });
-  //     }
+      if (
+        newMessages.length > 0 &&
+        newMessages[newMessages.length - 1].role === "assistant"
+      ) {
+        newMessages[newMessages.length - 1].content = currentResponse;
+      } else {
+        newMessages.push({  role: "assistant", content: currentResponse});
+      }
 
-  //     return newMessages;
-  //   });
-  // }, [currentResponse]);
+      return newMessages;
+    });
+  }, [currentResponse]);
 
-  // useEffect(() => {
-  //   if (gptComplete) {
-  //     if (
-  //       messages[messages.length - 1]?.text === currentResponse &&
-  //       messages[messages.length - 1]?.sender === "AI Tutor"
-  //     ) {
-  //       setCurrentResponse("");
-  //     }
-  //   }
-  // }, [gptComplete, messages, currentResponse]);
+  useEffect(() => {
+    if (gptComplete) {
+      if (
+        messages[messages.length - 1]?.content === currentResponse &&
+        messages[messages.length - 1]?.role === "assistant"
+      ) {
+        setCurrentResponse("");
+      }
+    }
+  }, [gptComplete, messages, currentResponse]);
 
   const messagesRef = useRef(null);
 
@@ -126,7 +114,7 @@ function Chat() {
 
     const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 75;
     if (isScrolledToBottom) {
-      scroll.scrollToBottom({duration: 10});
+      scroll.scrollToBottom({ duration: 10 });
     }
   };
 
@@ -134,7 +122,7 @@ function Chat() {
 
   useEffect(() => {
     if (!messagesRef.current) return;
-    console.log("scrolling")
+    console.log("scrolling");
     debouncedScrollToBottom();
   }, [messagesRef.current?.scrollHeight]);
 
@@ -144,19 +132,21 @@ function Chat() {
     };
   }, []);
 
+  console.log("Messages:", messages);
+  console.log("Current Response:", currentResponse);
   return (
     <ChatWrap className="chat-container">
       <AppBar />
       <Display ref={messagesRef} className="messages-container">
         {messages.map((message, index) => {
           return (
-            <Message key={index} className={`${message.sender}`} >
+            <Message key={index} className={`${message.role}`}>
               <User>
-                <p>{message.sender}</p>
+                <p>{message.role}</p>
               </User>
 
-              <TextBubble className={`${message.sender}`}>
-                <p>{message.text}</p>*
+              <TextBubble className={`${message.role}`}>
+                <p>{message.content}</p>
               </TextBubble>
             </Message>
           );
@@ -194,10 +184,10 @@ const Display = styled.div`
   padding: 20px;
   margin: 0 0 81px;
   overflow-y: auto;
-  .Me {
+  .user {
     align-items: flex-end;
   }
-  .AI {
+  .assistant {
     text-align: flex-start;
   }
 `;
@@ -228,12 +218,12 @@ const Message = styled.div`
   p {
     margin: 0;
   }
-  .Me {
+  .user {
     border-radius: 25px 25px 5px 25px;
     background-color: #0157f9;
     color: white;
   }
-  .AI {
+  .assistant {
     border-radius: 25px 25px 25px 5px;
     background-color: #ffffff;
     color: black;
