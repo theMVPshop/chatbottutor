@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { TagCloud } from 'react-tagcloud';
+import TagWithTooltip from "./TagWithTooltip";
 
 // eslint-disable-next-line react/prop-types
 const Insights = () => {
@@ -67,50 +68,7 @@ const Insights = () => {
   const customRenderer = (tag, fontSize, color) => {
     const isHovered = hoveredTag === tag.value;
 
-    return (
-      <span
-        key={tag.value}
-        style={{
-          margin: "0 0.5rem",
-          color,
-          fontSize,
-          display: 'inline-block',
-          width: 'auto',
-          whiteSpace: 'nowrap',
-          cursor: 'pointer',
-          zIndex: isHovered ? 1 : 0,
-        }}
-        className={`tag`}
-        onMouseEnter={() => setHoveredTag(tag.value)}
-        onMouseLeave={() => setHoveredTag(null)}>
-        <span
-          style={{
-            position: 'relative',
-            zIndex: 0,
-            opacity: 0.99
-          }}
-        >
-          {tag.value}
-          <span
-            style={{
-              position: 'absolute',
-              bottom: "-2.5rem",
-              left: 0,
-              fontSize: "0.8rem",
-              backgroundColor: "#666668",
-              padding: "0.5rem",
-              borderRadius: "0.5rem",
-              opacity: isHovered ? 1 : 0,
-              zIndex: isHovered ? 1 : 0,
-              transition: 'opacity .3s ease',
-              color: "white",
-            }}
-          >
-            Mentioned {tag.count} times
-          </span>
-        </span>
-      </span >
-    );
+    return <TagWithTooltip tag={tag} fontSize={fontSize} color={color} />
   };
 
   return (
