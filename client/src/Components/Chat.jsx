@@ -112,7 +112,7 @@ function Chat() {
     const scrollHeight = document.documentElement.scrollHeight;
     const clientHeight = window.innerHeight;
 
-    const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 150;
+    const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 200;
     if (isScrolledToBottom) {
       scroll.scrollToBottom({ duration: 10 });
     }
@@ -155,7 +155,7 @@ function Chat() {
       } else if (inCodeBlock) {
         codeBlockContent += line + '\n';
       } else {
-        segments.push(<span key={`text-${index}`}>{line}</span>);
+        segments.push(<span key={`text-${index}`}>{line}</span>, <br key={`br-${index}`} />);
       }
     });
 
@@ -165,6 +165,10 @@ function Chat() {
           {codeBlockContent}
         </SyntaxHighlighter>
       );
+    }
+
+    if (!inCodeBlock) {
+      segments.pop();
     }
 
     return segments;
