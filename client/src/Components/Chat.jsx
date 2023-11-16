@@ -7,12 +7,12 @@ import AppBar from "./AppBar.jsx";
 import { animateScroll as scroll } from "react-scroll";
 import { debounce } from "lodash";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 function Chat() {
   const [currentResponse, setCurrentResponse] = useState("");
   const [messageInput, setMessageInput] = useState("");
-  const [messages, setMessages] = useState([]); // [{message: "Hello!", sender: "user"}, {message: "Hi!", sender: "AI Tutor"}]
+  const [messages, setMessages] = useState([]);
   const [gptComplete, setGptComplete] = useState(true);
 
   function sendGPTRequest(prompt) {
@@ -33,8 +33,8 @@ function Chat() {
     setGptComplete(false);
     sendGPTRequest({
       message: messages,
-       newMessage
-    });    
+      newMessage
+    });
     setMessageInput("");
   }
 
@@ -87,7 +87,7 @@ function Chat() {
       ) {
         newMessages[newMessages.length - 1].content = currentResponse;
       } else {
-        newMessages.push({  role: "assistant", content: currentResponse});
+        newMessages.push({ role: "assistant", content: currentResponse });
       }
 
       return newMessages;
@@ -112,11 +112,8 @@ function Chat() {
     const scrollHeight = document.documentElement.scrollHeight;
     const clientHeight = window.innerHeight;
 
-    console.log(scrollHeight - (scrollTop + clientHeight));
-
-    const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 75;
+    const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 150;
     if (isScrolledToBottom) {
-      scroll.scrollToBottom({ duration: 10 });
       scroll.scrollToBottom({ duration: 10 });
     }
   };
@@ -125,7 +122,6 @@ function Chat() {
 
   useEffect(() => {
     if (!messagesRef.current) return;
-    console.log("scrolling");
     debouncedScrollToBottom();
   }, [messagesRef.current?.scrollHeight]);
 
@@ -136,22 +132,42 @@ function Chat() {
   }, []);
 
   const renderMessageContent = (message) => {
-    // Split the message by the code block syntax
-    const segments = message.split(/(```\w*\s[\s\S]*?```)/);
-    return segments.map((segment, index) => {
-      // Check if the segment is a code block
-      if (segment.startsWith('```')) {
-        // Extract the language and code
-        const match = segment.match(/```(\w*)\s([\s\S]*)```/);
-        const language = match[1];
-        const code = match[2];
-        // Render using SyntaxHighlighter
-        return <SyntaxHighlighter language={language || 'text'} style={dark} key={index}>{code}</SyntaxHighlighter>;
+    if (!message) return;
+
+    const segments = [];
+    let inCodeBlock = false;
+    let codeBlockContent = '';
+    let language = 'text';
+
+    message.split('\n').forEach((line, index) => {
+      if (line.startsWith('```') && !inCodeBlock) {
+        inCodeBlock = true;
+        const match = line.match(/```(\w*)/);
+        language = match[1] || 'text';
+        codeBlockContent = '';
+      } else if (line.startsWith('```') && inCodeBlock) {
+        inCodeBlock = false;
+        segments.push(
+          <SyntaxHighlighter language={language} style={tomorrow} key={`code-${index}`}>
+            {codeBlockContent}
+          </SyntaxHighlighter>
+        );
+      } else if (inCodeBlock) {
+        codeBlockContent += line + '\n';
       } else {
-        // Render regular text
-        return <span key={index}>{segment}</span>;
+        segments.push(<span key={`text-${index}`}>{line}</span>);
       }
     });
+
+    if (inCodeBlock) {
+      segments.push(
+        <SyntaxHighlighter language={language} style={tomorrow} key={`code-incomplete`}>
+          {codeBlockContent}
+        </SyntaxHighlighter>
+      );
+    }
+
+    return segments;
   };
 
   return (
@@ -159,12 +175,12 @@ function Chat() {
       <AppBar />
       <Display ref={messagesRef} className="messages-container">
         {messages.map((message, index) => (
-          <Message key={index} className={`${message.sender}`}>
+          <Message key={index} className={`${message.role}`}>
             <User>
-              <p>{message.sender}</p>
+              <p>{message.role === 'user' ? 'Me' : 'AI Tutor'}</p>
             </User>
-            <TextBubble className={`${message.sender}`}>
-              <p>{renderMessageContent(message.text)}</p>
+            <TextBubble className={`${message.role}`}>
+              <p>{renderMessageContent(message.content)}</p>
             </TextBubble>
           </Message>
         ))}
