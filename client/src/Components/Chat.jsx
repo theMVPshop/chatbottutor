@@ -6,6 +6,8 @@ import "../App.css";
 import AppBar from "./AppBar.jsx";
 import { animateScroll as scroll } from "react-scroll";
 import { debounce } from "lodash";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 function Chat() {
   const [currentResponse, setCurrentResponse] = useState("");
@@ -112,7 +114,7 @@ function Chat() {
 
     const isScrolledToBottom = scrollTop + clientHeight >= scrollHeight - 75;
     if (isScrolledToBottom) {
-      scroll.scrollToBottom({duration: 10});
+      scroll.scrollToBottom({ duration: 10 });
     }
   };
 
@@ -130,23 +132,39 @@ function Chat() {
     };
   }, []);
 
+  const renderMessageContent = (message) => {
+    // Split the message by the code block syntax
+    const segments = message.split(/(```\w*\s[\s\S]*?```)/);
+    return segments.map((segment, index) => {
+      // Check if the segment is a code block
+      if (segment.startsWith('```')) {
+        // Extract the language and code
+        const match = segment.match(/```(\w*)\s([\s\S]*)```/);
+        const language = match[1];
+        const code = match[2];
+        // Render using SyntaxHighlighter
+        return <SyntaxHighlighter language={language || 'text'} style={dark} key={index}>{code}</SyntaxHighlighter>;
+      } else {
+        // Render regular text
+        return <span key={index}>{segment}</span>;
+      }
+    });
+  };
+
   return (
     <ChatWrap className="chat-container">
       <AppBar />
       <Display ref={messagesRef} className="messages-container">
-        {messages.map((message, index) => {
-          return (
-            <Message key={index} className={`${message.sender}`}>
-              <User>
-                <p>{message.sender}</p>
-              </User>
-
-              <TextBubble className={`${message.sender}`}>
-                <p>{message.text}</p>
-              </TextBubble>
-            </Message>
-          );
-        })}
+        {messages.map((message, index) => (
+          <Message key={index} className={`${message.sender}`}>
+            <User>
+              <p>{message.sender}</p>
+            </User>
+            <TextBubble className={`${message.sender}`}>
+              <p>{renderMessageContent(message.text)}</p>
+            </TextBubble>
+          </Message>
+        ))}
       </Display>
       <InputWrap>
         <ChatInput
