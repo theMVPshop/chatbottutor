@@ -38,3 +38,8 @@ body {
 pre {
   border-radius: 0.5rem;
 }
+
+.assistant,
+.user {
+  max-width: calc(100vw - 4rem);
+}

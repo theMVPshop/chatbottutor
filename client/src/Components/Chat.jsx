@@ -248,7 +248,6 @@ const Message = styled.div`
   height: fit-content;
   color: gray;
   width: 900px;
-  padding-left: 8px;
   @media only screen and (max-width: 940px) {
     width: 100%;
   }
