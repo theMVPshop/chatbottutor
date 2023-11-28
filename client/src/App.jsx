@@ -12,7 +12,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Chat />} />
+        <Route path="/:module?" element={<Chat />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>
     </Router>
