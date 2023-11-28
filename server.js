@@ -51,6 +51,19 @@ io.on('connection', (socket) => {
     try {
       const { module, prompt } = data;
       console.log(data)
+      let moduleContext = "";
+      if(module == 101){
+          // System message catered to Web 101
+          moduleContext = "";
+      } else if (module == 211){
+        moduleContext = "";
+      } else if (module == 311) {
+        moduleContext = "";
+      } else if (module == 411) {
+        moduleContext ="";
+      } else (console.error("Class selected is not valid."))
+
+      
       const stream = await openai.chat.completions.create({
         model: "gpt-4-1106-preview",
         messages: [
