@@ -8,6 +8,7 @@ import { animateScroll as scroll } from "react-scroll";
 import { debounce } from "lodash";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { useParams } from "react-router-dom";
 
 function Chat() {
   const [currentResponse, setCurrentResponse] = useState("");
@@ -15,8 +16,10 @@ function Chat() {
   const [messages, setMessages] = useState([]);
   const [gptComplete, setGptComplete] = useState(true);
 
+  const { module } = useParams();
+
   function sendGPTRequest(prompt) {
-    socket.emit("gpt-request", prompt);
+    socket.emit("gpt-request", {module, prompt});
     console.log(socket.connected);
   }
 
