@@ -6,7 +6,7 @@ import "dotenv/config";
 import OpenAI from "openai";
 import axios from "axios";
 import chatRouter from "./server/routes/chat.js";
-import { context311, context411 } from "./context.js";
+import { context101, context211, context311, context411 } from "./context.js";
 
 import { Server } from "socket.io";
 import { createServer } from 'http';
@@ -55,9 +55,9 @@ io.on('connection', (socket) => {
       let moduleContext = "";
       if (module == 101) {
         // System message section catered to Web 101
-        moduleContext = ``;
+        moduleContext = context101;
       } else if (module == 211) {
-        moduleContext = ``;
+        moduleContext = context211;
       } else if (module == 311) {
         moduleContext = context311;
       } else if (module == 411) {
