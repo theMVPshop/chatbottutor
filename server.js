@@ -51,6 +51,8 @@ io.on('connection', (socket) => {
     try {
       const { module, prompt } = data;
 
+      module = module || "411";
+
       const moduleContextMap = [
         { id: "101", context: context101 },
         { id: "211", context: context211 },
