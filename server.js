@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
   socket.on('gpt-request', async (data) => {
     console.log("gpt request socket hit")
     try {
-      const { module, prompt } = data;
+      let { module, prompt } = data;
 
       module = module || "411";
 
