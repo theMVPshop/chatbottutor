@@ -38,7 +38,7 @@ app.get('*', function (_req, res) {
 const httpServer = createServer(app);
 const io = new Server(httpServer, {   // Pass httpServer to the Server from socket.io
   cors: {
-    origin: "http://localhost:5173", // Make sure this matches your client-side URL
+    origin: "https://chatbottutor-7e7843ea9900.herokuapp.com", // Make sure this matches your client-side URL
     methods: ["GET", "POST"]
   }
 });
