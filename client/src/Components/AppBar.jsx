@@ -18,11 +18,11 @@ function AppBar() {
             </StatusWrapper>
           </Title>
         </Tag>
-        <Menu>
+        {/* <Menu>
           <Link to="/admin" target="_blank">
             <AdminBtn>Admin</AdminBtn>
           </Link>
-        </Menu>
+        </Menu> */}
       </Content>
     </AppWrap>
   );
